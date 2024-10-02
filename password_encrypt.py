@@ -1,3 +1,5 @@
+import tkinter as tk
+from tkinter import messagebox
 from cryptography.fernet import Fernet
 
 # Generate a key for encryption
@@ -24,14 +26,56 @@ def decrypt_password(encrypted_password):
     decrypted_password = f.decrypt(encrypted_password).decode()
     return decrypted_password
 
-if __name__ == "__main__":
-    # Generate a key only once and save it
+# GUI Functions
+def encrypt():
+    password = password_entry.get()
+    if password:
+        encrypted = encrypt_password(password)
+        output_entry.delete(0, tk.END)
+        output_entry.insert(0, encrypted)
+    else:
+        messagebox.showwarning("Warning", "Please enter a password to encrypt.")
+
+def decrypt():
+    encrypted_password = output_entry.get()
+    if encrypted_password:
+        try:
+            decrypted = decrypt_password(encrypted_password.encode())
+            output_entry.delete(0, tk.END)
+            output_entry.insert(0, decrypted)
+        except Exception:
+            messagebox.showerror("Error", "Invalid encrypted password.")
+    else:
+        messagebox.showwarning("Warning", "Please enter an encrypted password to decrypt.")
+
+# Set up the main window
+root = tk.Tk()
+root.title("Password Encryption App")
+
+# Generate the key if it doesn't exist
+try:
+    load_key()
+except FileNotFoundError:
     generate_key()
 
-    # Example usage
-    password = input("Enter the password to encrypt: ")
-    encrypted = encrypt_password(password)
-    print(f"Encrypted password: {encrypted}")
+# Create input fields and buttons
+password_label = tk.Label(root, text="Enter Password:")
+password_label.pack(pady=5)
 
-    decrypted = decrypt_password(encrypted)
-    print(f"Decrypted password: {decrypted}")
+password_entry = tk.Entry(root, width=50, show='*')
+password_entry.pack(pady=5)
+
+encrypt_button = tk.Button(root, text="Encrypt", command=encrypt)
+encrypt_button.pack(pady=5)
+
+decrypt_button = tk.Button(root, text="Decrypt", command=decrypt)
+decrypt_button.pack(pady=5)
+
+output_label = tk.Label(root, text="Output (Encrypted/Decrypted):")
+output_label.pack(pady=5)
+
+output_entry = tk.Entry(root, width=50)
+output_entry.pack(pady=5)
+
+# Start the GUI loop
+root.mainloop()
