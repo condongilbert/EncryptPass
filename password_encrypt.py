@@ -4,6 +4,9 @@ from cryptography.fernet import Fernet
 import json
 import os
 
+
+
+
 # Load or generate key
 def load_key():
     if os.path.exists("secret.key"):
@@ -37,6 +40,16 @@ def load_passwords():
             return json.load(f)
     return {}
 
+# Master password check
+def check_master_password():
+    master_password = simpledialog.askstring("Master Password", "Enter master password:", show='*')
+    if master_password == 'test':  # Replace 'your_master_password' with the actual master password
+        return True
+    else:
+        messagebox.showerror("Error", "Incorrect master password!")
+        root.destroy()  # Close the application if the password is incorrect
+        return False
+
 # GUI Functions
 def add_password():
     website = simpledialog.askstring("Input", "Enter website:")
@@ -69,6 +82,10 @@ root.title("Password Manager")
 
 # Load existing passwords
 passwords = load_passwords()
+
+# Master password check before anything else
+if not check_master_password():
+    root.quit()  # Exit if the master password check fails
 
 # Create buttons and list box
 add_button = tk.Button(root, text="Add Password", command=add_password)
